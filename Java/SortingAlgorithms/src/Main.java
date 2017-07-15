@@ -2,6 +2,7 @@
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 
@@ -52,6 +53,45 @@ public class Main {
                 data[n] = swap;
             }
         }
+
+        public static void heapSort(int[] data) {
+
+            BiConsumer<Integer,Integer> swap = (Integer a, Integer b) -> {
+                int d = data[a];
+                data[a] = data[b];
+                data[b] = d;
+            };
+
+            BiConsumer<Integer,Integer>[] heapify = new BiConsumer[1];
+            heapify[0] = (Integer idx, Integer max) -> {
+                int largest = idx;
+                int left = 2 * idx + 1;
+                int right = 2 * idx + 2;
+
+                if(left < max && data[left] > data[idx])
+                    largest = left;
+                if(right < max && data[right] > data[largest])
+                    largest = right;
+                if(largest != idx) {
+                    swap.accept(idx, largest);
+                    heapify[0].accept(largest, max);
+                }
+
+                ++basicOp;
+            };
+
+
+            for(int i=data.length/2 - 1; i >= 0; --i) {
+
+                heapify[0].accept(i, data.length);
+            }
+
+            for(int i=data.length - 1; i >= 1; --i) {
+
+                swap.accept(0, i);
+                heapify[0].accept(0, i);
+            }
+        }
     }
 
     public static void display(int[] data) {
@@ -64,8 +104,10 @@ public class Main {
         int[] data = {7, 1, 4, 8, 2, 3, 5, 9, 0};
         int[] mutableData = new int[data.length];
         Map<String, Consumer<int[]>> sortingAlgorithms = new HashMap<String, Consumer<int[]>>();
+
         sortingAlgorithms.put("Bubble Sort", Sort::bubbleSort);
         sortingAlgorithms.put("Selection Sort", Sort::selectionSort);
+        sortingAlgorithms.put("Heap Sort", Sort::heapSort);
 
 
         for(Map.Entry sort: sortingAlgorithms.entrySet()) {
