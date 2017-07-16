@@ -3,7 +3,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.lang.Math;
 
 
 public class Main {
@@ -56,14 +58,14 @@ public class Main {
 
         public static void heapSort(int[] data) {
 
-            BiConsumer<Integer,Integer> swap = (Integer a, Integer b) -> {
+            BiConsumer<Integer,Integer> swap = (a, b) -> {
                 int d = data[a];
                 data[a] = data[b];
                 data[b] = d;
             };
 
             BiConsumer<Integer,Integer>[] heapify = new BiConsumer[1];
-            heapify[0] = (Integer idx, Integer max) -> {
+            heapify[0] = (idx, max) -> {
                 int largest = idx;
                 int left = 2 * idx + 1;
                 int right = 2 * idx + 2;
@@ -92,7 +94,60 @@ public class Main {
                 heapify[0].accept(0, i);
             }
         }
+
+        public static void quickSort(int[] data) {
+
+            BiConsumer<Integer,Integer> swap = (a, b) -> {
+                int d = data[a];
+                data[a] = data[b];
+                data[b] = d;
+            };
+
+            BiFunction<Integer,Integer,Integer> partition = (left, right) -> {
+                int pivot = left, divider = pivot + 1;
+
+                if(left.equals(right)) return right;
+
+                while(data[divider] < data[pivot] && divider < right) {
+                    ++divider;
+                    ++basicOp;
+                }
+
+                for(int i=divider; i <= right; ++i) {
+
+                    if(data[i] < data[pivot]) {
+                        swap.accept(i, divider);
+                        ++divider;
+                    }
+
+                    ++basicOp;
+                }
+
+                --divider;
+
+                if(data[divider] < data[pivot]) {
+                    swap.accept(pivot, divider);
+                }
+
+                return divider;
+            };
+
+            BiConsumer<Integer,Integer>[] qsort = new BiConsumer[1];
+            qsort[0] = (left, right) -> {
+
+                if(left < right) {
+                    int pivotIndex = partition.apply(left, right);
+                    qsort[0].accept(left, pivotIndex - 1);
+                    qsort[0].accept(pivotIndex + 1, right);
+                }
+            };
+
+
+            qsort[0].accept(0, data.length - 1);
+        }
     }
+
+
 
     public static void display(int[] data) {
 
@@ -108,6 +163,7 @@ public class Main {
         sortingAlgorithms.put("Bubble Sort", Sort::bubbleSort);
         sortingAlgorithms.put("Selection Sort", Sort::selectionSort);
         sortingAlgorithms.put("Heap Sort", Sort::heapSort);
+        sortingAlgorithms.put("Quick Sort", Sort::quickSort);
 
 
         for(Map.Entry sort: sortingAlgorithms.entrySet()) {
