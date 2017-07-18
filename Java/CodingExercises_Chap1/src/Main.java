@@ -1,9 +1,18 @@
 
+import java.util.Collections;
+
 import static org.junit.Assert.*;
 
 
 public class Main {
 
+
+    public static String reverse(final String str) {
+
+        StringBuilder sb = new StringBuilder(str);
+
+        return sb.reverse().toString();
+    }
 
     public static boolean hasUniqueChar(final String str) {
 
@@ -27,7 +36,9 @@ public class Main {
         assertTrue(hasUniqueChar("helo wrd"));
 
         // 1.2
-        
+        assertTrue(reverse("Hello World").equals("dlroW olleH"));
+        assertFalse(reverse("I love Java").equals("So Should You"));
 
+        // 1.3
     }
 }
