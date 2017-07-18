@@ -1,11 +1,24 @@
 
 import java.util.Collections;
-
+import java.util.function.Function;
 import static org.junit.Assert.*;
 
 
 public class Main {
 
+
+    private static boolean isPermutation(final String a, final String b) {
+
+        Function<String,String> strSort = str -> {
+            char[] arr = str.toCharArray();
+            java.util.Arrays.sort(arr);
+            return new String(arr);
+        };
+
+        if(a.equals(b)) return true;
+
+        return strSort.apply(a).equals(strSort.apply(b));
+    }
 
     public static String reverse(final String str) {
 
@@ -40,5 +53,7 @@ public class Main {
         assertFalse(reverse("I love Java").equals("So Should You"));
 
         // 1.3
+        assertTrue(isPermutation("jobs", "sojb"));
+        assertFalse(isPermutation("hello", "world"));
     }
 }
