@@ -1,5 +1,8 @@
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import static org.junit.Assert.*;
 
@@ -12,6 +15,33 @@ import static org.junit.Assert.*;
 
 
 public class Main {
+
+    private static String compressStr(final String str) {
+
+        final Map<Character,Integer> map = new HashMap<>();
+        StringBuilder sb = new StringBuilder();
+
+        for (char c : str.toCharArray()) {
+
+            if(map.containsKey(c)) {
+                map.replace(c, map.get(c) + 1);
+            }
+            else {
+                map.put(c, 1);
+            }
+        }
+
+        for (char c : str.toCharArray()) {
+
+            if(sb.indexOf(Character.toString(c)) == -1) {
+
+                sb.append(c);
+                sb.append(map.get(c));
+            }
+        }
+
+        return sb.toString();
+    }
 
     // Note: this exercise shouldn't use the String library
     private static String replaceAllSpaceWith(char[] chars, final char replaceWith) {
@@ -79,6 +109,6 @@ public class Main {
                         .equals("Hello5my5name5is5John"));
 
         // 1.5
-        
+        assertTrue(compressStr("Hello World").equals("H1e1l3o2 1W1r1d1"));
     }
 }
