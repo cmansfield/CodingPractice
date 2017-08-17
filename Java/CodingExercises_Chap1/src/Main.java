@@ -1,8 +1,6 @@
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import static org.junit.Assert.*;
 
@@ -110,5 +108,8 @@ public class Main {
 
         // 1.5
         assertTrue(compressStr("Hello World").equals("H1e1l3o2 1W1r1d1"));
+
+        // 1.6
+
     }
 }
