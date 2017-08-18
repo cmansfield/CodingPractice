@@ -1,6 +1,7 @@
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Vector;
 
 
@@ -8,15 +9,14 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Vector<Card> cards = new Vector<>(1000);
-        Object jsonObj;
+        final String TEST_CARD = "/resources/TestCard.json";
+        final String ALL_CARDS = "/resources/AllCards-x.json";
 
+        try {
+            MTG gameMaster = new MTG(new File("").getAbsolutePath() + TEST_CARD);
 
-        jsonObj = JSON_IO.loadJSON(new File("").getAbsolutePath()
-                + "/resources/AllCards-x.json");
-
-        String query = JSON_IO.stringifyQuery("subtypes", jsonObj);
-
-        System.out.println(query);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -12,7 +12,7 @@ import java.util.Vector;
 
 public class JSON_IO {
 
-    public static Object loadJSON(final String file) {
+    public static Object loadJSON(final File file) {
         JSONParser parser = new JSONParser();
 
         try {
@@ -41,8 +41,14 @@ public class JSON_IO {
 
             if(!card.containsKey(keyToQuery)) continue;
 
+            if(card.get(keyToQuery) instanceof String) {
+                if(!queryResults.contains((String)card.get(keyToQuery))) {
+                    queryResults.add((String)card.get(keyToQuery));
+                }
+                continue;
+            }
+
             JSONArray queryArr = (JSONArray)card.get(keyToQuery);
-            Iterator superTypeIter = queryArr.iterator();
 
             for ( Object elem : queryArr ) {
                 if(!queryResults.contains((String)elem)) {
@@ -50,6 +56,18 @@ public class JSON_IO {
                 }
             }
         }
+
+//        for (String result : queryResults) {
+//            System.out.printf("\"%s\", ", result);
+//        }
+//
+//        System.out.println();
+//
+//        for (String result : queryResults) {
+//            System.out.printf("%s, ", result.toUpperCase());
+//        }
+//
+//        System.out.println();
 
         return queryResults.toString();
     }
