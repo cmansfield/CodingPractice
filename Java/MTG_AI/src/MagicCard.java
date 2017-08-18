@@ -1,6 +1,7 @@
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
+import static java.lang.Math.toIntExact;
 
 import java.awt.*;
 import java.text.Normalizer;
@@ -85,19 +86,19 @@ public class MagicCard implements IMagicCard {
 
             Map<String, Consumer<Object>> optionalConsumers = new HashMap<>();
             optionalConsumers.put("manaCost", this::manaCost);
-//            optionalConsumers.put("cmc", this::cmc);
+            optionalConsumers.put("cmc", this::cmc);
 //            optionalConsumers.put("colors", this::colors);
 //            optionalConsumers.put("supertypes", this::superTypes);
 //            optionalConsumers.put("types", this::types);
 //            optionalConsumers.put("subtypes", this::subTypes);
-//            optionalConsumers.put("text", this::text);
-//            optionalConsumers.put("power", this::power);
-//            optionalConsumers.put("toughness", this::toughness);
+            optionalConsumers.put("text", this::text);
+            optionalConsumers.put("power", this::power);
+            optionalConsumers.put("toughness", this::toughness);
 //            optionalConsumers.put("colorIdentity", this::colorIdentity);
 
 
             requiredConsumers.forEach((key, value) -> {
-                if(!card.containsKey(key)) throw new IllegalArgumentException("Missing required parameters");
+                if(!card.containsKey(key)) throw new IllegalArgumentException("Missing required card parameter");
                 value.accept(card.get(key));
             });
 
@@ -166,8 +167,39 @@ public class MagicCard implements IMagicCard {
             return this;
         }
 
-        // TODO
         public CardBuilder power(final Object power) {
+
+            if(!(power instanceof String)) throw new IllegalArgumentException("Invalid argument for card power");
+
+            Pattern digitP = Pattern.compile(IS_DIGIT_PATTERN);
+            Matcher match = digitP.matcher((String)power);
+
+            if(!match.find()) throw new IllegalArgumentException("Invalid argument for card power");
+
+            this._power = Integer.parseInt((String)power);
+
+            return this;
+        }
+
+        public CardBuilder toughness(final Object toughness) {
+
+            if(!(toughness instanceof String)) throw new IllegalArgumentException("Invalid argument for card toughness");
+
+            Pattern digitP = Pattern.compile(IS_DIGIT_PATTERN);
+            Matcher match = digitP.matcher((String)toughness);
+
+            if(!match.find()) throw new IllegalArgumentException("Invalid argument for card toughness");
+
+            this._toughness = Integer.parseInt((String)toughness);
+
+            return this;
+        }
+
+        public CardBuilder cmc(final Object cmc) {
+
+            if(!(cmc instanceof Long)) throw new IllegalArgumentException("Invalid argument for card cmc");
+
+            this._cmc = toIntExact((long)cmc);
 
             return this;
         }
@@ -251,11 +283,15 @@ public class MagicCard implements IMagicCard {
     public String toString() {
 
         return String.format(
-                "\"%s\" Layout: %s, %s, %s",
+                "\t\"%s\" Layout: %s, CMC: %d, %s, [%d/%d], %s %n%s",
                 this.name,
                 LAYOUT[this.layout.ordinal()],
-                (this.manaCost.isEmpty()) ? "" : String.format("ManaCost: %s", stringifyManaCost()),
-                this.legalities.toString()
+                this.cmc,
+                String.format("ManaCost: %s", stringifyManaCost()),
+                this.power,
+                this.toughness,
+                this.legalities.toString(),
+                this.text
         );
     }
 
