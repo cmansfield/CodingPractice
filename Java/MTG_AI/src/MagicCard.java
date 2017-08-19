@@ -1,10 +1,11 @@
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
+
+import javax.smartcardio.Card;
+
 import static java.lang.Math.toIntExact;
 
-import java.awt.*;
-import java.text.Normalizer;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
@@ -77,6 +78,7 @@ public class MagicCard implements IMagicCard {
 
             this._manaCost = new HashMap<>();
             this._legalities = new EnumMap<Format, Boolean>(Format.class);
+            this._colors = new Vector<>();
 
             Map<String, Consumer<Object>> requiredConsumers = new HashMap<>();
             requiredConsumers.put("layout", this::layout);
@@ -87,14 +89,14 @@ public class MagicCard implements IMagicCard {
             Map<String, Consumer<Object>> optionalConsumers = new HashMap<>();
             optionalConsumers.put("manaCost", this::manaCost);
             optionalConsumers.put("cmc", this::cmc);
-//            optionalConsumers.put("colors", this::colors);
+            optionalConsumers.put("colors", this::colors);
 //            optionalConsumers.put("supertypes", this::superTypes);
 //            optionalConsumers.put("types", this::types);
 //            optionalConsumers.put("subtypes", this::subTypes);
             optionalConsumers.put("text", this::text);
             optionalConsumers.put("power", this::power);
             optionalConsumers.put("toughness", this::toughness);
-//            optionalConsumers.put("colorIdentity", this::colorIdentity);
+            optionalConsumers.put("colorIdentity", this::colorIdentity);
 
 
             requiredConsumers.forEach((key, value) -> {
@@ -195,6 +197,24 @@ public class MagicCard implements IMagicCard {
             return this;
         }
 
+        public CardBuilder colors(final Object colors) {
+
+            if(!(colors instanceof JSONArray)) throw new IllegalArgumentException("Invalid argument for card colors");
+
+            JSONArray colorsArr = (JSONArray)colors;
+
+            for(Object color : colorsArr) {
+                if(!(color instanceof String)) throw new IllegalArgumentException("Invalid argument for card color");
+
+                int colorIndex = Arrays.asList(COLORS).indexOf((String)color);
+                if(colorIndex == VALUE_NOT_FOUND) throw new IllegalArgumentException("Invalid argument for card color");
+
+                this._colors.addElement(Colors.values()[colorIndex]);
+            }
+
+            return this;
+        }
+
         public CardBuilder cmc(final Object cmc) {
 
             if(!(cmc instanceof Long)) throw new IllegalArgumentException("Invalid argument for card cmc");
@@ -256,6 +276,12 @@ public class MagicCard implements IMagicCard {
             return this;
         }
 
+        public CardBuilder colorIdentity(final Object colorIdent) {
+
+
+            return this;
+        }
+
         public MagicCard build() {
             return new MagicCard(this);
         }
@@ -279,18 +305,25 @@ public class MagicCard implements IMagicCard {
         this.colorIdentity = builder._colorIdentity;
     }
 
+    public String toSimpleString() {
+
+        return String.format(
+                "\"%s\" Layout: %s, CMC: %d%s, [%d/%d] ",
+                this.name,
+                LAYOUT[this.layout.ordinal()],
+                this.cmc,
+                ((this.manaCost.isEmpty()) ? "" : String.format(", ManaCost: %s", stringifyManaCost())),
+                this.power,
+                this.toughness
+        );
+    }
+
     @Override
     public String toString() {
 
         return String.format(
-                "\t\"%s\" Layout: %s, CMC: %d, %s, [%d/%d], %s %n%s",
-                this.name,
-                LAYOUT[this.layout.ordinal()],
-                this.cmc,
-                String.format("ManaCost: %s", stringifyManaCost()),
-                this.power,
-                this.toughness,
-                this.legalities.toString(),
+                "\t%s %n%s",
+                toSimpleString(),
                 this.text
         );
     }
