@@ -278,6 +278,33 @@ public class MagicCard implements IMagicCard {
 
         public CardBuilder colorIdentity(final Object colorIdent) {
 
+            if(!(colorIdent instanceof JSONArray)) throw new IllegalArgumentException("Invalid argument for card color identity");
+
+            JSONArray colorsArr = (JSONArray)colorIdent;
+
+            for(Object color : colorsArr) {
+                if(!(color instanceof String)) throw new IllegalArgumentException("Invalid argument for card identity");
+
+                switch((String)color) {
+                    case "W":
+                        this._colorIdentity = Colors.WHITE;
+                        break;
+                    case "R":
+                        this._colorIdentity = Colors.RED;
+                        break;
+                    case "B":
+                        this._colorIdentity = Colors.BLACK;
+                        break;
+                    case "U":
+                        this._colorIdentity = Colors.BLUE;
+                        break;
+                    case "G":
+                        this._colorIdentity = Colors.GREEN;
+                        break;
+                    default:
+                    this._colorIdentity = Colors.COLORLESS;
+                }
+            }
 
             return this;
         }
@@ -308,8 +335,9 @@ public class MagicCard implements IMagicCard {
     public String toSimpleString() {
 
         return String.format(
-                "\"%s\" Layout: %s, CMC: %d%s, [%d/%d] ",
+                "\"%s\" [%s] Layout: %s, CMC: %d%s, [%d/%d] ",
                 this.name,
+                this.colorIdentity,
                 LAYOUT[this.layout.ordinal()],
                 this.cmc,
                 ((this.manaCost.isEmpty()) ? "" : String.format(", ManaCost: %s", stringifyManaCost())),
