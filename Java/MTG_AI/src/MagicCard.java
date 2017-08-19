@@ -1,9 +1,6 @@
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
-
-import javax.smartcardio.Card;
-
 import static java.lang.Math.toIntExact;
 
 import java.util.*;
@@ -42,8 +39,8 @@ public class MagicCard implements IMagicCard {
     private Vector<Types> types;
     private Vector<String> subTypes;
     private String text;
-    private int power;
-    private int toughness;
+    private String power;
+    private String toughness;
     private EnumMap<Format,Boolean> legalities;
     private Colors colorIdentity;
 
@@ -63,12 +60,12 @@ public class MagicCard implements IMagicCard {
         private Vector<Types> _types;
         private Vector<String> _subTypes;
         private String _text;
-        private int _power;
-        private int _toughness;
+        private String _power;
+        private String _toughness;
         private Colors _colorIdentity;
 
         static final String MANA_PATTERN = "(?:\\{(\\d+|[wrbugWRBUG])\\})";
-        static final String IS_DIGIT_PATTERN = "^(?:\\d+)$";
+        static final String POWER_TOUGH_PATTERN = "^(?:(?:(?:[0-9](?:\\.[0-9])?)+)|(?:\\*))$";
 
 
         public CardBuilder(Object jsonCard) {
@@ -79,28 +76,32 @@ public class MagicCard implements IMagicCard {
             this._manaCost = new HashMap<>();
             this._legalities = new EnumMap<Format, Boolean>(Format.class);
             this._colors = new Vector<>();
+            this._superTypes = new Vector<>();
+            this._types = new Vector<>();
+            this._subTypes = new Vector<>();
 
             Map<String, Consumer<Object>> requiredConsumers = new HashMap<>();
             requiredConsumers.put("layout", this::layout);
             requiredConsumers.put("name", this::name);
             requiredConsumers.put("type", this::type);
-            requiredConsumers.put("legalities", this::legalities);
 
             Map<String, Consumer<Object>> optionalConsumers = new HashMap<>();
             optionalConsumers.put("manaCost", this::manaCost);
             optionalConsumers.put("cmc", this::cmc);
             optionalConsumers.put("colors", this::colors);
-//            optionalConsumers.put("supertypes", this::superTypes);
-//            optionalConsumers.put("types", this::types);
-//            optionalConsumers.put("subtypes", this::subTypes);
+            optionalConsumers.put("supertypes", this::superTypes);
+            optionalConsumers.put("types", this::types);
+            optionalConsumers.put("subtypes", this::subTypes);
             optionalConsumers.put("text", this::text);
             optionalConsumers.put("power", this::power);
             optionalConsumers.put("toughness", this::toughness);
             optionalConsumers.put("colorIdentity", this::colorIdentity);
+            optionalConsumers.put("legalities", this::legalities);
 
 
             requiredConsumers.forEach((key, value) -> {
-                if(!card.containsKey(key)) throw new IllegalArgumentException("Missing required card parameter");
+                if(!card.containsKey(key))
+                    throw new IllegalArgumentException(String.format("Missing required parameter for card %s", this._name));
                 value.accept(card.get(key));
             });
 
@@ -171,28 +172,32 @@ public class MagicCard implements IMagicCard {
 
         public CardBuilder power(final Object power) {
 
-            if(!(power instanceof String)) throw new IllegalArgumentException("Invalid argument for card power");
+            if(!(power instanceof String))
+                throw new IllegalArgumentException(String.format("Invalid argument for card %s's power", this._name));
 
-            Pattern digitP = Pattern.compile(IS_DIGIT_PATTERN);
+            Pattern digitP = Pattern.compile(POWER_TOUGH_PATTERN);
             Matcher match = digitP.matcher((String)power);
 
-            if(!match.find()) throw new IllegalArgumentException("Invalid argument for card power");
+            if(!match.find())
+                throw new IllegalArgumentException(String.format("Invalid argument for card %s's power", this._name));
 
-            this._power = Integer.parseInt((String)power);
+            this._power = (String)power;
 
             return this;
         }
 
         public CardBuilder toughness(final Object toughness) {
 
-            if(!(toughness instanceof String)) throw new IllegalArgumentException("Invalid argument for card toughness");
+            if(!(toughness instanceof String))
+                throw new IllegalArgumentException(String.format("Invalid argument for card %s's toughness", this._name));
 
-            Pattern digitP = Pattern.compile(IS_DIGIT_PATTERN);
+            Pattern digitP = Pattern.compile(POWER_TOUGH_PATTERN);
             Matcher match = digitP.matcher((String)toughness);
 
-            if(!match.find()) throw new IllegalArgumentException("Invalid argument for card toughness");
+            if(!match.find())
+                throw new IllegalArgumentException(String.format("Invalid argument for card %s's toughness", this._name));
 
-            this._toughness = Integer.parseInt((String)toughness);
+            this._toughness = (String)toughness;
 
             return this;
         }
@@ -210,6 +215,57 @@ public class MagicCard implements IMagicCard {
                 if(colorIndex == VALUE_NOT_FOUND) throw new IllegalArgumentException("Invalid argument for card color");
 
                 this._colors.addElement(Colors.values()[colorIndex]);
+            }
+
+            return this;
+        }
+
+        public CardBuilder superTypes(final Object superTypes) {
+
+            if(!(superTypes instanceof JSONArray)) throw new IllegalArgumentException("Invalid argument for card super type");
+
+            JSONArray typesArr = (JSONArray)superTypes;
+
+            for(Object type : typesArr) {
+                if(!(type instanceof String)) throw new IllegalArgumentException("Invalid argument for card super type");
+
+                int typeIndex = Arrays.asList(SUPER_TYPES).indexOf((String)type);
+                if(typeIndex == VALUE_NOT_FOUND) throw new IllegalArgumentException("Invalid argument for card super type");
+
+                this._superTypes.addElement(SuperTypes.values()[typeIndex]);
+            }
+
+            return this;
+        }
+
+        public CardBuilder types(final Object types) {
+
+            if(!(types instanceof JSONArray)) throw new IllegalArgumentException("Invalid argument for card type");
+
+            JSONArray typesArr = (JSONArray)types;
+
+            for(Object type : typesArr) {
+                if(!(type instanceof String)) throw new IllegalArgumentException("Invalid argument for card type");
+
+                int typeIndex = Arrays.asList(TYPES).indexOf((String)type);
+                if(typeIndex == VALUE_NOT_FOUND) throw new IllegalArgumentException("Invalid argument for card type");
+
+                this._types.addElement(Types.values()[typeIndex]);
+            }
+
+            return this;
+        }
+
+        public CardBuilder subTypes(final Object subTypes) {
+
+            if(!(subTypes instanceof JSONArray)) throw new IllegalArgumentException("Invalid argument for card sub-type");
+
+            JSONArray types = (JSONArray)subTypes;
+
+            for(Object type : types) {
+                if(!(type instanceof String)) throw new IllegalArgumentException("Invalid argument for sub-type");
+
+                this._subTypes.addElement((String)type);
             }
 
             return this;

@@ -13,7 +13,7 @@ public class Main {
         final String ALL_CARDS = "/resources/AllCards-x.json";
 
         try {
-            MTG gameMaster = new MTG(new File("").getAbsolutePath() + TEST_CARD);
+            MTG gameMaster = new MTG(new File("").getAbsolutePath() + ALL_CARDS);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
