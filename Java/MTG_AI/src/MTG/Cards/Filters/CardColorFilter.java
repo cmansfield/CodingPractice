@@ -3,6 +3,7 @@ package MTG.Cards.Filters;
 import MTG.Cards.IMagicCard;
 import MTG.Cards.CardTypes.*;
 
+import java.util.Map.Entry;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,10 +22,9 @@ public class CardColorFilter implements ICardFilter {
         List<IMagicCard> filteredList = new ArrayList<IMagicCard>();
 
         for(IMagicCard card : cards) {
-            Iterator iter = card.getColorsIterator();
-
+            Iterator<Entry<Colors,Integer>> iter = card.getManaCostIterator();
             while(iter.hasNext()) {
-                if(iter.next() == color) {
+                if(iter.next().getKey() == this.color) {
                     filteredList.add(card);
                     break;
                 }

@@ -9,7 +9,6 @@ import MTG.Cards.CardTypes.*;
 import io.JSON_IO;
 import org.json.simple.JSONObject;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Iterator;
@@ -38,8 +37,8 @@ public class MTG {
 
         System.out.println(cards.size());
 
-        for(Colors color : Colors.values()) {
 
+        for(Colors color : Colors.values()) {
             ICardFilter filterTest = new CardColorFilter(color);
             System.out.print(color + " ");
             List<IMagicCard> filteredCards = filterTest.query(cards);
