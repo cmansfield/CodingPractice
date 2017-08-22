@@ -1,5 +1,7 @@
 package MTG;
 
+import MTG.Cards.Filters.CardAndFilter;
+import MTG.Cards.Filters.CardCmcFilter;
 import MTG.Cards.Filters.CardColorFilter;
 import MTG.Cards.Filters.ICardFilter;
 import MTG.Cards.IMagicCard;
@@ -11,10 +13,8 @@ import org.json.simple.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 
 public class MTG {
@@ -37,11 +37,13 @@ public class MTG {
 
         System.out.println(cards.size());
 
+        ICardFilter cmcFilter = new CardCmcFilter(1.0);
 
         for(Colors color : Colors.values()) {
             ICardFilter filterTest = new CardColorFilter(color);
+            ICardFilter andFilter = new CardAndFilter(cmcFilter, filterTest);
             System.out.print(color + " ");
-            List<IMagicCard> filteredCards = filterTest.query(cards);
+            List<IMagicCard> filteredCards = andFilter.query(cards);
             System.out.println(filteredCards.size());
             if(!filteredCards.isEmpty())
                 System.out.println("\t" + filteredCards.get(0).toSimpleString());

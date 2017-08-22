@@ -17,6 +17,7 @@ public class CardColorFilter implements ICardFilter {
         this.color = color;
     }
 
+    @Override
     public List<IMagicCard> query(List<IMagicCard> cards) {
 
         List<IMagicCard> filteredList = new ArrayList<IMagicCard>();
