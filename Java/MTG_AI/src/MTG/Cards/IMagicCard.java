@@ -1,9 +1,12 @@
+package MTG.Cards;
+
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import MTG.Cards.CardTypes.*;
 
 
-interface IMagicCard {
+public interface IMagicCard {
     public Layout getLayout();
     public String getName();
     public Iterator<Entry<Colors,Integer>> getManaCostIterator();

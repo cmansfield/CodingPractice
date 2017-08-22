@@ -1,3 +1,7 @@
+package MTG.Cards;
+
+import MTG.*;
+import MTG.Cards.CardTypes.*;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
@@ -10,21 +14,14 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 
-enum SuperTypes { LEGENDARY, BASIC, SNOW, WOLRD, ONGOING }
-enum Types { INSTANT, SORCERY, LAND, CREATURE, TRIBAL, ARTIFACT, ENCHANTMENT, VANGUARD, PLANESWALKER, SCHEME, PLANE, CONSPIRACY, PHENOMENON, EATURECRAY, ENCHANT, PLAYER, UNKNOWN_TYPE }
-enum Colors { WHITE, BLACK, RED, BLUE, GREEN, COLORLESS }
-enum Format { STANDARD, COMMANDER, LEGACY, MODERN, VINTAGE, UNSETS }
-enum Layout { NORMAL, DOUBLE_FACED, VANGUARD, SPLIT, TOKEN, SCHEME, LEVELER, MELD, AFTERMATH, FLIP, PLANE, PHENOMENON, UNKNOWN }
-
-
 public class MagicCard implements IMagicCard {
 
-    private final static String[] SUPER_TYPES = { "Legendary", "Basic", "Snow", "World", "Ongoing" };
-    private final static String[] TYPES = { "Instant", "Sorcery", "Land", "Creature", "Tribal", "Artifact", "Enchantment", "Vanguard", "Planeswalker",
+    public final static String[] SUPER_TYPES = { "Legendary", "Basic", "Snow", "World", "Ongoing" };
+    public final static String[] TYPES = { "Instant", "Sorcery", "Land", "Creature", "Tribal", "Artifact", "Enchantment", "Vanguard", "Planeswalker",
             "Scheme", "Plane", "Conspiracy", "Phenomenon", "Eaturecray", "Enchant", "Player", "UnknownType" };
-    private final static String[] COLORS = { "White", "Black", "Red", "Blue", "Green", "Colorless" };
-    private final static String[] FORMAT = { "Standard", "Commander", "Legacy", "Modern", "Vintage", "Un-Sets" };
-    private final static String[] LAYOUT = { "normal", "double-faced", "vanguard", "split", "token", "scheme", "leveler", "meld", "aftermath", "flip",
+    public final static String[] COLORS = { "White", "Black", "Red", "Blue", "Green", "Colorless" };
+    public final static String[] FORMAT = { "Standard", "Commander", "Legacy", "Modern", "Vintage", "Un-Sets" };
+    public final static String[] LAYOUT = { "normal", "double-faced", "vanguard", "split", "token", "scheme", "leveler", "meld", "aftermath", "flip",
             "plane", "phenomenon" };
 
     private static final int VALUE_NOT_FOUND = -1;

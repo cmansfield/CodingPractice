@@ -1,3 +1,6 @@
+package MTG;
+
+import MTG.Cards.IMagicCard;
 
 import java.util.Vector;
 

@@ -1,8 +1,9 @@
+package io;
 
+import MTG.MTG;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Vector;
 
 
 public class Main {
