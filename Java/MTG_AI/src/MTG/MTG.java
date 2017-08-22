@@ -1,13 +1,19 @@
 package MTG;
 
+import MTG.Cards.Filters.CardColorFilter;
+import MTG.Cards.Filters.ICardFilter;
 import MTG.Cards.IMagicCard;
 import MTG.Cards.MagicCard;
+import MTG.Cards.CardTypes.*;
+
 import io.JSON_IO;
 import org.json.simple.JSONObject;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -30,17 +36,18 @@ public class MTG {
             this.cards.addElement(new MagicCard.CardBuilder(jsonObj.get(key)).build());
         }
 
-        System.out.println(cards.get(0).toSimpleString());
+        System.out.println(cards.size());
 
-        Iterator test = cards.get(0).getManaCostIterator();
+        for(Colors color : Colors.values()) {
 
-        while(test.hasNext()) {
-
-            Entry pair = (Entry)test.next();
-            System.out.print(pair.getKey());
-            System.out.print(" ");
-            System.out.println(pair.getValue());
+            ICardFilter filterTest = new CardColorFilter(color);
+            System.out.print(color + " ");
+            List<IMagicCard> filteredCards = filterTest.query(cards);
+            System.out.println(filteredCards.size());
+            if(!filteredCards.isEmpty())
+                System.out.println("\t" + filteredCards.get(0).toSimpleString());
         }
+
     }
 }
 
