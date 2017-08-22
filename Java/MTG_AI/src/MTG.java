@@ -3,7 +3,9 @@ import org.json.simple.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Iterator;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 
 public class MTG {
@@ -24,7 +26,17 @@ public class MTG {
             this.cards.addElement(new MagicCard.CardBuilder(jsonObj.get(key)).build());
         }
 
-        System.out.println(cards.get(0).toString());
+        System.out.println(cards.get(0).toSimpleString());
+
+        Iterator test = cards.get(0).getManaCostIterator();
+
+        while(test.hasNext()) {
+
+            Entry pair = (Entry)test.next();
+            System.out.print(pair.getKey());
+            System.out.print(" ");
+            System.out.println(pair.getValue());
+        }
     }
 }
 

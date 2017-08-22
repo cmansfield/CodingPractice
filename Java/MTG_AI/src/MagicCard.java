@@ -376,6 +376,7 @@ public class MagicCard implements IMagicCard {
         }
     }
 
+
     private MagicCard(CardBuilder builder) {
 
         this.layout = builder._layout;
@@ -392,6 +393,73 @@ public class MagicCard implements IMagicCard {
         this.toughness = builder._toughness;
         this.legalities = builder._legalities;
         this.colorIdentity = builder._colorIdentity;
+    }
+
+    private String stringifyManaCost() {
+
+        String str = "";
+
+        for(Entry<Colors,Integer> pair : this.manaCost.entrySet()) {
+            str += String.format("%d-%s ", pair.getValue(), COLORS[pair.getKey().ordinal()]);
+        }
+
+        return str;
+    }
+
+    public Layout getLayout() {
+        return layout;
+    }
+
+    public final String getName() {
+        return name;
+    }
+
+    public Iterator<Entry<Colors,Integer>> getManaCostIterator() {
+        return manaCost.entrySet().iterator();
+    }
+
+    public double getCmc() {
+        return cmc;
+    }
+
+    public Iterator<Colors> getColorsIterator() {
+        return colors.iterator();
+    }
+
+    public final String getType() {
+        return type;
+    }
+
+    public Iterator<SuperTypes> getSuperTypes() {
+        return superTypes.iterator();
+    }
+
+    public Iterator<Types> getTypes() {
+        return types.iterator();
+    }
+
+    public Iterator<String> getSubTypes() {
+        return subTypes.iterator();
+    }
+
+    public final String getText() {
+        return text;
+    }
+
+    public final String getPower() {
+        return power;
+    }
+
+    public final String getToughness() {
+        return toughness;
+    }
+
+    public Iterator<EnumMap.Entry<Format, Boolean>> getLegalities() {
+        return legalities.entrySet().iterator();
+    }
+
+    public Colors getColorIdentity() {
+        return colorIdentity;
     }
 
     public String toSimpleString() {
@@ -415,16 +483,5 @@ public class MagicCard implements IMagicCard {
                 toSimpleString(),
                 this.text
         );
-    }
-
-    private String stringifyManaCost() {
-
-        String str = "";
-
-        for(Entry<Colors,Integer> pair : this.manaCost.entrySet()) {
-            str += String.format("%d-%s ", pair.getValue(), COLORS[pair.getKey().ordinal()]);
-        }
-
-        return str;
     }
 }
