@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 
 
 enum SuperTypes { LEGENDARY, BASIC, SNOW, WOLRD, ONGOING }
-enum Types { INSTANT, SORCERY, LAND, CREATURE, TRIBAL, ARTIFACT, ENCHANTMENT, VANGUARD, PLANESWALKER, SCHEME, PLANE, CONSPIRACY, PHENOMENON, EATURECRAY, ENCHANT, PLAYER }
+enum Types { INSTANT, SORCERY, LAND, CREATURE, TRIBAL, ARTIFACT, ENCHANTMENT, VANGUARD, PLANESWALKER, SCHEME, PLANE, CONSPIRACY, PHENOMENON, EATURECRAY, ENCHANT, PLAYER, UNKNOWN_TYPE }
 enum Colors { WHITE, BLACK, RED, BLUE, GREEN, COLORLESS }
 enum Format { STANDARD, COMMANDER, LEGACY, MODERN, VINTAGE, UNSETS }
 enum Layout { NORMAL, DOUBLE_FACED, VANGUARD, SPLIT, TOKEN, SCHEME, LEVELER, MELD, AFTERMATH, FLIP, PLANE, PHENOMENON, UNKNOWN }
@@ -21,7 +21,7 @@ public class MagicCard implements IMagicCard {
 
     private final static String[] SUPER_TYPES = { "Legendary", "Basic", "Snow", "World", "Ongoing" };
     private final static String[] TYPES = { "Instant", "Sorcery", "Land", "Creature", "Tribal", "Artifact", "Enchantment", "Vanguard", "Planeswalker",
-            "Scheme", "Plane", "Conspiracy", "Phenomenon", "Eaturecray", "Enchant", "Player" };
+            "Scheme", "Plane", "Conspiracy", "Phenomenon", "Eaturecray", "Enchant", "Player", "UnknownType" };
     private final static String[] COLORS = { "White", "Black", "Red", "Blue", "Green", "Colorless" };
     private final static String[] FORMAT = { "Standard", "Commander", "Legacy", "Modern", "Vintage", "Un-Sets" };
     private final static String[] LAYOUT = { "normal", "double-faced", "vanguard", "split", "token", "scheme", "leveler", "meld", "aftermath", "flip",
@@ -32,7 +32,7 @@ public class MagicCard implements IMagicCard {
     private Layout layout;
     private String name;
     private Map<Colors,Integer> manaCost;
-    private int cmc;
+    private double cmc;
     private Vector<Colors> colors;
     private String type;
     private Vector<SuperTypes> superTypes;
@@ -54,7 +54,7 @@ public class MagicCard implements IMagicCard {
 
         // optional
         private Map<Colors,Integer> _manaCost;
-        private int _cmc;
+        private double _cmc;
         private Vector<Colors> _colors;
         private Vector<SuperTypes> _superTypes;
         private Vector<Types> _types;
@@ -175,11 +175,11 @@ public class MagicCard implements IMagicCard {
             if(!(power instanceof String))
                 throw new IllegalArgumentException(String.format("Invalid argument for card %s's power", this._name));
 
-            Pattern digitP = Pattern.compile(POWER_TOUGH_PATTERN);
-            Matcher match = digitP.matcher((String)power);
-
-            if(!match.find())
-                throw new IllegalArgumentException(String.format("Invalid argument for card %s's power", this._name));
+//            Pattern digitP = Pattern.compile(POWER_TOUGH_PATTERN);
+//            Matcher match = digitP.matcher((String)power);
+//
+//            if(!match.find())
+//                throw new IllegalArgumentException(String.format("Invalid argument for card %s's power", this._name));
 
             this._power = (String)power;
 
@@ -191,11 +191,11 @@ public class MagicCard implements IMagicCard {
             if(!(toughness instanceof String))
                 throw new IllegalArgumentException(String.format("Invalid argument for card %s's toughness", this._name));
 
-            Pattern digitP = Pattern.compile(POWER_TOUGH_PATTERN);
-            Matcher match = digitP.matcher((String)toughness);
-
-            if(!match.find())
-                throw new IllegalArgumentException(String.format("Invalid argument for card %s's toughness", this._name));
+//            Pattern digitP = Pattern.compile(POWER_TOUGH_PATTERN);
+//            Matcher match = digitP.matcher((String)toughness);
+//
+//            if(!match.find())
+//                throw new IllegalArgumentException(String.format("Invalid argument for card %s's toughness", this._name));
 
             this._toughness = (String)toughness;
 
@@ -240,17 +240,20 @@ public class MagicCard implements IMagicCard {
 
         public CardBuilder types(final Object types) {
 
-            if(!(types instanceof JSONArray)) throw new IllegalArgumentException("Invalid argument for card type");
+            if(!(types instanceof JSONArray))
+                throw new IllegalArgumentException(String.format("Invalid argument for card %s's type", this._name));
 
             JSONArray typesArr = (JSONArray)types;
 
             for(Object type : typesArr) {
-                if(!(type instanceof String)) throw new IllegalArgumentException("Invalid argument for card type");
+                if(!(type instanceof String))
+                    throw new IllegalArgumentException(String.format("Invalid argument for card %s's type", this._name));
 
                 int typeIndex = Arrays.asList(TYPES).indexOf((String)type);
-                if(typeIndex == VALUE_NOT_FOUND) throw new IllegalArgumentException("Invalid argument for card type");
-
-                this._types.addElement(Types.values()[typeIndex]);
+                if(typeIndex == VALUE_NOT_FOUND)
+                    this._types.addElement(Types.UNKNOWN_TYPE);
+                else
+                    this._types.addElement(Types.values()[typeIndex]);
             }
 
             return this;
@@ -273,9 +276,12 @@ public class MagicCard implements IMagicCard {
 
         public CardBuilder cmc(final Object cmc) {
 
-            if(!(cmc instanceof Long)) throw new IllegalArgumentException("Invalid argument for card cmc");
-
-            this._cmc = toIntExact((long)cmc);
+            if(cmc instanceof Long)
+                this._cmc = toIntExact((long)cmc);
+            else if(cmc instanceof Double)
+                this._cmc = (double)cmc;
+            else
+                throw new IllegalArgumentException(String.format("Invalid argument for card %s's cmc", this._name));
 
             return this;
         }
@@ -391,14 +397,13 @@ public class MagicCard implements IMagicCard {
     public String toSimpleString() {
 
         return String.format(
-                "\"%s\" [%s] Layout: %s, CMC: %d%s, [%d/%d] ",
+                "\"%s\" [%s] Layout: %s, CMC: %.1f%s%s ",
                 this.name,
                 this.colorIdentity,
                 LAYOUT[this.layout.ordinal()],
                 this.cmc,
                 ((this.manaCost.isEmpty()) ? "" : String.format(", ManaCost: %s", stringifyManaCost())),
-                this.power,
-                this.toughness
+                ((this.power == null) ? "" : String.format(", [%s/%s]", this.power, this.toughness ))
         );
     }
 
