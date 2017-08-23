@@ -37,10 +37,12 @@ public class MTG {
         ICardFilter commanderFilter = new CardLegalityFilter(Format.COMMANDER);
         List<IMagicCard> commanderCards = commanderFilter.query(cards);
         ICardFilter greatestToughnessFilter = new CardGreatestPowerOrToughnessFilter("toughness");
+        ICardFilter greatestCmcFilter = new CardGreatestCmcFilter();
+
 
         for(Colors color : Colors.values()) {
             ICardFilter onlyColorFilter = new CardOnlyColorFilter(color);
-            ICardFilter andFilter = new CardAndFilter(onlyColorFilter, greatestToughnessFilter);
+            ICardFilter andFilter = new CardAndFilter(onlyColorFilter, greatestCmcFilter);
             System.out.print(color + " ");
             List<IMagicCard> filteredCards = andFilter.query(commanderCards);
             System.out.println(filteredCards.size());
