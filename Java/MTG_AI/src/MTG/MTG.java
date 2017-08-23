@@ -34,13 +34,15 @@ public class MTG {
 
         System.out.println(cards.size());
 
-        ICardFilter greatestPowerFilter = new CardGreatestPowerOrToughnessFilter("toughness");
+        ICardFilter commanderFilter = new CardLegalityFilter(Format.COMMANDER);
+        List<IMagicCard> commanderCards = commanderFilter.query(cards);
+        ICardFilter greatestToughnessFilter = new CardGreatestPowerOrToughnessFilter("toughness");
 
         for(Colors color : Colors.values()) {
             ICardFilter onlyColorFilter = new CardOnlyColorFilter(color);
-            ICardFilter andFilter = new CardAndFilter(onlyColorFilter, greatestPowerFilter);
+            ICardFilter andFilter = new CardAndFilter(onlyColorFilter, greatestToughnessFilter);
             System.out.print(color + " ");
-            List<IMagicCard> filteredCards = andFilter.query(cards);
+            List<IMagicCard> filteredCards = andFilter.query(commanderCards);
             System.out.println(filteredCards.size());
 //            if(!filteredCards.isEmpty())
 //                System.out.println("\t" + filteredCards.get(0).toSimpleString());

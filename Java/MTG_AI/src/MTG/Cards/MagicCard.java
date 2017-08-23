@@ -144,14 +144,17 @@ public class MagicCard implements IMagicCard {
             if(!(legal instanceof JSONArray)) throw new IllegalArgumentException("Invalid argument for card legalities");
 
             String strFormat = "";
+            String strLegal = "";
             int index = 0;
 
             for(Object elem : (JSONArray)legal) {
 
                 strFormat = (String)((JSONObject)elem).get("format");
+                strLegal = (String)((JSONObject)elem).get("legality");
                 index = Arrays.asList(FORMAT).indexOf(strFormat);
 
                 if(index == VALUE_NOT_FOUND) continue;
+                if(!strLegal.equals("Legal")) continue;
 
                 this._legalities.put(Format.values()[index], true);
             }
