@@ -1,9 +1,6 @@
 package MTG;
 
-import MTG.Cards.Filters.CardAndFilter;
-import MTG.Cards.Filters.CardCmcFilter;
-import MTG.Cards.Filters.CardColorFilter;
-import MTG.Cards.Filters.ICardFilter;
+import MTG.Cards.Filters.*;
 import MTG.Cards.IMagicCard;
 import MTG.Cards.MagicCard;
 import MTG.Cards.CardTypes.*;
@@ -37,16 +34,19 @@ public class MTG {
 
         System.out.println(cards.size());
 
-        ICardFilter cmcFilter = new CardCmcFilter(1.0);
+        ICardFilter greatestPowerFilter = new CardGreatestPowerOrToughnessFilter("toughness");
 
         for(Colors color : Colors.values()) {
-            ICardFilter filterTest = new CardColorFilter(color);
-            ICardFilter andFilter = new CardAndFilter(cmcFilter, filterTest);
+            ICardFilter onlyColorFilter = new CardOnlyColorFilter(color);
+            ICardFilter andFilter = new CardAndFilter(onlyColorFilter, greatestPowerFilter);
             System.out.print(color + " ");
             List<IMagicCard> filteredCards = andFilter.query(cards);
             System.out.println(filteredCards.size());
-            if(!filteredCards.isEmpty())
-                System.out.println("\t" + filteredCards.get(0).toSimpleString());
+//            if(!filteredCards.isEmpty())
+//                System.out.println("\t" + filteredCards.get(0).toSimpleString());
+            for(IMagicCard card : filteredCards) {
+                System.out.println(card.toSimpleString());
+            }
         }
 
     }

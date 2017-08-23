@@ -9,11 +9,11 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class CardColorFilter implements ICardFilter {
+public class CardHasColorFilter implements ICardFilter {
 
     private Colors color;
 
-    public CardColorFilter(Colors color) {
+    public CardHasColorFilter(Colors color) {
         this.color = color;
     }
 
