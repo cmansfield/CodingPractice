@@ -13,6 +13,8 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Vector;
 
+//import static MTG.Cards.CardTypes.ICardType.*;
+
 
 public class MTG {
 
@@ -20,38 +22,52 @@ public class MTG {
 
     public MTG(final String strFile) throws FileNotFoundException {
 
-        File file = new File(strFile);
-        if(!file.exists() || file.isDirectory()) throw new FileNotFoundException(strFile);
+        spike();
 
-        this.cards = new Vector<>(1000);
-        JSONObject jsonObj = (JSONObject) JSON_IO.loadJSON(file);
+//        File file = new File(strFile);
+//        if(!file.exists() || file.isDirectory()) throw new FileNotFoundException(strFile);
+//
+//        this.cards = new Vector<>(1000);
+//        JSONObject jsonObj = (JSONObject) JSON_IO.loadJSON(file);
+//
+//        jsonObj.keySet().iterator();
+//
+//        for(Object key : jsonObj.keySet()) {
+//            this.cards.addElement(new MagicCard.CardBuilder(jsonObj.get(key)).build());
+//        }
+//
+//        System.out.println(cards.size());
+//
+//        ICardFilter commanderFilter = new CardLegalityFilter(Formats.COMMANDER);
+//        List<IMagicCard> commanderCards = commanderFilter.query(cards);
+//        ICardFilter greatestToughnessFilter = new CardGreatestPowerOrToughnessFilter("toughness");
+//        ICardFilter greatestCmcFilter = new CardGreatestCmcFilter();
+//
+//
+//        for(Colors color : Colors.values()) {
+//            ICardFilter onlyColorFilter = new CardOnlyColorFilter(color);
+//            ICardFilter andFilter = new CardAndFilter(onlyColorFilter, greatestCmcFilter);
+//            System.out.print(color + " ");
+//            List<IMagicCard> filteredCards = andFilter.query(commanderCards);
+//            System.out.println(filteredCards.size());
+////            if(!filteredCards.isEmpty())
+////                System.out.println("\t" + filteredCards.get(0).toSimpleString());
+//            for(IMagicCard card : filteredCards) {
+//                System.out.println(card.toSimpleString());
+//            }
+//        }
 
-        jsonObj.keySet().iterator();
-
-        for(Object key : jsonObj.keySet()) {
-            this.cards.addElement(new MagicCard.CardBuilder(jsonObj.get(key)).build());
-        }
-
-        System.out.println(cards.size());
-
-        ICardFilter commanderFilter = new CardLegalityFilter(Format.COMMANDER);
-        List<IMagicCard> commanderCards = commanderFilter.query(cards);
-        ICardFilter greatestToughnessFilter = new CardGreatestPowerOrToughnessFilter("toughness");
-        ICardFilter greatestCmcFilter = new CardGreatestCmcFilter();
+    }
 
 
-        for(Colors color : Colors.values()) {
-            ICardFilter onlyColorFilter = new CardOnlyColorFilter(color);
-            ICardFilter andFilter = new CardAndFilter(onlyColorFilter, greatestCmcFilter);
-            System.out.print(color + " ");
-            List<IMagicCard> filteredCards = andFilter.query(commanderCards);
-            System.out.println(filteredCards.size());
-//            if(!filteredCards.isEmpty())
-//                System.out.println("\t" + filteredCards.get(0).toSimpleString());
-            for(IMagicCard card : filteredCards) {
-                System.out.println(card.toSimpleString());
-            }
-        }
+
+    private void spike() {
+
+        System.out.println(Colors.contains("w"));
+        System.out.println(Colors.contains("K"));
+        System.out.println(Colors.find("w"));
+        System.out.println(Colors.find("K"));
+
 
     }
 }

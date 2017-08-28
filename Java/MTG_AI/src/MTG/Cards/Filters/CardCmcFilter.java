@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CardCmcFilter implements ICardFilter {
 
-    private double cmc;
+    private final double cmc;
 
     public CardCmcFilter(double cmc) {
         this.cmc = cmc;
@@ -17,7 +17,7 @@ public class CardCmcFilter implements ICardFilter {
     @Override
     public List<IMagicCard> query(List<IMagicCard> cards) {
 
-        List<IMagicCard> filteredList = new ArrayList<IMagicCard>();
+        List<IMagicCard> filteredList = new ArrayList<>();
 
         for(IMagicCard card : cards) {
             if(card.getCmc() == this.cmc) filteredList.add(card);

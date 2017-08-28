@@ -43,7 +43,7 @@ public class JSON_IO {
             if(!card.containsKey(keyToQuery)) continue;
 
             if(card.get(keyToQuery) instanceof String) {
-                if(!queryResults.contains((String)card.get(keyToQuery))) {
+                if(!queryResults.contains(card.get(keyToQuery))) {
                     queryResults.add((String)card.get(keyToQuery));
                 }
                 continue;
@@ -52,7 +52,7 @@ public class JSON_IO {
             JSONArray queryArr = (JSONArray)card.get(keyToQuery);
 
             for ( Object elem : queryArr ) {
-                if(!queryResults.contains((String)elem)) {
+                if(!queryResults.contains(elem)) {
                     queryResults.add((String)elem);
                 }
             }

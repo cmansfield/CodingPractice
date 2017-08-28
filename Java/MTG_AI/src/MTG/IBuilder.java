@@ -2,5 +2,5 @@ package MTG;
 
 public interface IBuilder {
 
-    public Object build();
+    Object build();
 }

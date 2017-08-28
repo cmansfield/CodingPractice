@@ -7,7 +7,7 @@ import java.util.Vector;
 
 public class Player {
 
-    private Vector<IMagicCard> cards;
+    private final Vector<IMagicCard> cards;
 
 
     public Player() {

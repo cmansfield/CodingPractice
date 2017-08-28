@@ -7,14 +7,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.BiFunction;
-import java.util.function.BooleanSupplier;
-import java.util.function.Predicate;
 
 
 public class CardOnlyColorFilter implements ICardFilter {
 
-    private Colors color;
+    private final Colors color;
 
 
     private boolean isCardColor(Iterator<Entry<Colors,Integer>> iter) {
@@ -36,7 +33,7 @@ public class CardOnlyColorFilter implements ICardFilter {
     public List<IMagicCard> query(List<IMagicCard> cards) {
 
 
-        List<IMagicCard> filteredList = new ArrayList<IMagicCard>();
+        List<IMagicCard> filteredList = new ArrayList<>();
 
         for(IMagicCard card : cards) {
             Iterator<Entry<Colors,Integer>> iter = card.getManaCostIterator();

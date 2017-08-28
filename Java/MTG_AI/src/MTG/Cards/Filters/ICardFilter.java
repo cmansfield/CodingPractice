@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ICardFilter {
 
-    public List<IMagicCard> query(List<IMagicCard> cards);
+    List<IMagicCard> query(List<IMagicCard> cards);
 }

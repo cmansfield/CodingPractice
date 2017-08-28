@@ -13,7 +13,7 @@ public class CardGreatestCmcFilter implements ICardFilter {
     @Override
     public List<IMagicCard> query(List<IMagicCard> cards) {
 
-        List<IMagicCard> filteredList = new ArrayList<IMagicCard>();
+        List<IMagicCard> filteredList = new ArrayList<>();
         double max = -1;
 
 

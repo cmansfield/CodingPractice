@@ -16,17 +16,9 @@ import java.util.regex.Matcher;
 
 public class MagicCard implements IMagicCard {
 
-    public final static String[] SUPER_TYPES = { "Legendary", "Basic", "Snow", "World", "Ongoing" };
-    public final static String[] TYPES = { "Instant", "Sorcery", "Land", "Creature", "Tribal", "Artifact", "Enchantment", "Vanguard", "Planeswalker",
-            "Scheme", "Plane", "Conspiracy", "Phenomenon", "Eaturecray", "Enchant", "Player", "UnknownType" };
-    public final static String[] COLORS = { "White", "Black", "Red", "Blue", "Green", "Colorless" };
-    public final static String[] FORMAT = { "Standard", "Commander", "Legacy", "Modern", "Vintage", "Un-Sets" };
-    public final static String[] LAYOUT = { "normal", "double-faced", "vanguard", "split", "token", "scheme", "leveler", "meld", "aftermath", "flip",
-            "plane", "phenomenon" };
-
     private static final int VALUE_NOT_FOUND = -1;
 
-    private Layout layout;
+    private Layouts layout;
     private String name;
     private Map<Colors,Integer> manaCost;
     private double cmc;
@@ -38,16 +30,16 @@ public class MagicCard implements IMagicCard {
     private String text;
     private String power;
     private String toughness;
-    private EnumMap<Format,Boolean> legalities;
+    private EnumMap<Formats,Boolean> legalities;
     private Colors colorIdentity;
 
 
     public static class CardBuilder implements IBuilder {
         // required
-        private Layout _layout;
+        private Layouts _layout;
         private String _name;
         private String _type;
-        private EnumMap<Format,Boolean> _legalities;
+        private EnumMap<Formats,Boolean> _legalities;
 
         // optional
         private Map<Colors,Integer> _manaCost;
@@ -71,7 +63,7 @@ public class MagicCard implements IMagicCard {
             JSONObject card = (JSONObject)jsonCard;
 
             this._manaCost = new HashMap<>();
-            this._legalities = new EnumMap<Format, Boolean>(Format.class);
+            this._legalities = new EnumMap<>(Formats.class);
             this._colors = new Vector<>();
             this._superTypes = new Vector<>();
             this._types = new Vector<>();
@@ -110,15 +102,15 @@ public class MagicCard implements IMagicCard {
 
         public CardBuilder layout(final Object layout) {
 
-            if(!(layout instanceof String)) throw new IllegalArgumentException("Invalid argument for card layout");
-            int index = Arrays.asList(LAYOUT).indexOf(layout);
+            if(!(layout instanceof String))
+                throw new IllegalArgumentException("Invalid argument for card layout");
 
-            if(index == VALUE_NOT_FOUND) {
-                this._layout = Layout.UNKNOWN;
-                return this;
-            }
+            Layouts foundLayout = Layouts.find((String)layout);
 
-            this._layout = Layout.values()[index];
+            if(foundLayout == Layouts.UNKNOWN)
+                throw new IllegalArgumentException("Invalid argument for card layout");
+
+            this._layout = foundLayout;
             return this;
         }
 
@@ -143,20 +135,17 @@ public class MagicCard implements IMagicCard {
 
             if(!(legal instanceof JSONArray)) throw new IllegalArgumentException("Invalid argument for card legalities");
 
-            String strFormat = "";
-            String strLegal = "";
-            int index = 0;
+            String strLegal;
 
             for(Object elem : (JSONArray)legal) {
 
-                strFormat = (String)((JSONObject)elem).get("format");
                 strLegal = (String)((JSONObject)elem).get("legality");
-                index = Arrays.asList(FORMAT).indexOf(strFormat);
 
-                if(index == VALUE_NOT_FOUND) continue;
-                if(!strLegal.equals("Legal")) continue;
+                if(!strLegal.equalsIgnoreCase("Legal")) continue;
 
-                this._legalities.put(Format.values()[index], true);
+                this._legalities.put(
+                        Formats.find((String)((JSONObject)elem).get("format")),
+                        true);
             }
 
             return this;
@@ -204,17 +193,20 @@ public class MagicCard implements IMagicCard {
 
         public CardBuilder colors(final Object colors) {
 
-            if(!(colors instanceof JSONArray)) throw new IllegalArgumentException("Invalid argument for card colors");
+            if(!(colors instanceof JSONArray))
+                throw new IllegalArgumentException("Invalid argument for card colors");
 
             JSONArray colorsArr = (JSONArray)colors;
 
             for(Object color : colorsArr) {
-                if(!(color instanceof String)) throw new IllegalArgumentException("Invalid argument for card color");
+                if(!(color instanceof String))
+                    throw new IllegalArgumentException("Invalid argument for card color");
 
-                int colorIndex = Arrays.asList(COLORS).indexOf((String)color);
-                if(colorIndex == VALUE_NOT_FOUND) throw new IllegalArgumentException("Invalid argument for card color");
+                Colors foundColor = Colors.find((String)color);
+                if(foundColor == Colors.UNKNOWN)
+                    throw new IllegalArgumentException("Invalid argument for card color");
 
-                this._colors.addElement(Colors.values()[colorIndex]);
+                this._colors.addElement(foundColor);
             }
 
             return this;
@@ -222,17 +214,20 @@ public class MagicCard implements IMagicCard {
 
         public CardBuilder superTypes(final Object superTypes) {
 
-            if(!(superTypes instanceof JSONArray)) throw new IllegalArgumentException("Invalid argument for card super type");
+            if(!(superTypes instanceof JSONArray))
+                throw new IllegalArgumentException("Invalid argument for card super type");
 
             JSONArray typesArr = (JSONArray)superTypes;
 
             for(Object type : typesArr) {
-                if(!(type instanceof String)) throw new IllegalArgumentException("Invalid argument for card super type");
+                if(!(type instanceof String))
+                    throw new IllegalArgumentException("Invalid argument for card super type");
 
-                int typeIndex = Arrays.asList(SUPER_TYPES).indexOf((String)type);
-                if(typeIndex == VALUE_NOT_FOUND) throw new IllegalArgumentException("Invalid argument for card super type");
+                SuperTypes foundType = SuperTypes.find((String)type);
+                if(foundType == SuperTypes.UNKNOWN)
+                    throw new IllegalArgumentException("Invalid argument for card super type");
 
-                this._superTypes.addElement(SuperTypes.values()[typeIndex]);
+                this._superTypes.addElement(foundType);
             }
 
             return this;
@@ -249,11 +244,7 @@ public class MagicCard implements IMagicCard {
                 if(!(type instanceof String))
                     throw new IllegalArgumentException(String.format("Invalid argument for card %s's type", this._name));
 
-                int typeIndex = Arrays.asList(TYPES).indexOf((String)type);
-                if(typeIndex == VALUE_NOT_FOUND)
-                    this._types.addElement(Types.UNKNOWN_TYPE);
-                else
-                    this._types.addElement(Types.values()[typeIndex]);
+                this._types.addElement(Types.find((String)type));
             }
 
             return this;
@@ -290,50 +281,50 @@ public class MagicCard implements IMagicCard {
 
             if(!(mana instanceof String)) throw new IllegalArgumentException("Invalid argument for card mana cost");
 
-            Pattern manaP = Pattern.compile(MANA_PATTERN);
-            String remaining = (String)mana;
-            Matcher match = manaP.matcher(remaining);
-
-            while(match.find()) {
-                remaining = remaining.substring(match.end());
-                Colors selectedColor = Colors.COLORLESS;
-
-                switch (match.group(1).toUpperCase()) {
-                    case "W":
-                        selectedColor = Colors.WHITE;
-                        break;
-                    case "R":
-                        selectedColor = Colors.RED;
-                        break;
-                    case "B":
-                        selectedColor = Colors.BLACK;
-                        break;
-                    case "U":
-                        selectedColor = Colors.BLUE;
-                        break;
-                    case "G":
-                        selectedColor = Colors.GREEN;
-                        break;
-                    default:
-                        selectedColor = Colors.COLORLESS;
-
-                        try {
-                            int numMana = Integer.parseInt(match.group(1));
-                            this._manaCost.put(Colors.COLORLESS, numMana);
-                        } catch (NumberFormatException e) {
-                            throw new IllegalArgumentException("Invalid card mana cost argument");
-                        }
-                }
-
-                if(selectedColor != Colors.COLORLESS) {
-                    if(this._manaCost.containsKey(COLORS[selectedColor.ordinal()]))
-                        this._manaCost.put(selectedColor, this._manaCost.get(COLORS[selectedColor.ordinal()]));
-                    else
-                        this._manaCost.put(selectedColor, 1);
-                }
-
-                match = manaP.matcher(remaining);
-            }
+//            Pattern manaP = Pattern.compile(MANA_PATTERN);
+//            String remaining = (String)mana;
+//            Matcher match = manaP.matcher(remaining);
+//
+//            while(match.find()) {
+//                remaining = remaining.substring(match.end());
+//                Colors selectedColor = Colors.COLORLESS;
+//
+//                switch (match.group(1).toUpperCase()) {
+//                    case "W":
+//                        selectedColor = Colors.WHITE;
+//                        break;
+//                    case "R":
+//                        selectedColor = Colors.RED;
+//                        break;
+//                    case "B":
+//                        selectedColor = Colors.BLACK;
+//                        break;
+//                    case "U":
+//                        selectedColor = Colors.BLUE;
+//                        break;
+//                    case "G":
+//                        selectedColor = Colors.GREEN;
+//                        break;
+//                    default:
+//                        selectedColor = Colors.COLORLESS;
+//
+//                        try {
+//                            int numMana = Integer.parseInt(match.group(1));
+//                            this._manaCost.put(Colors.COLORLESS, numMana);
+//                        } catch (NumberFormatException e) {
+//                            throw new IllegalArgumentException("Invalid card mana cost argument");
+//                        }
+//                }
+//
+//                if(selectedColor != Colors.COLORLESS) {
+//                    if(this._manaCost.containsKey(COLORS[selectedColor.ordinal()]))
+//                        this._manaCost.put(selectedColor, this._manaCost.get(COLORS[selectedColor.ordinal()]));
+//                    else
+//                        this._manaCost.put(selectedColor, 1);
+//                }
+//
+//                match = manaP.matcher(remaining);
+//            }
 
             return this;
         }
@@ -400,13 +391,13 @@ public class MagicCard implements IMagicCard {
         String str = "";
 
         for(Entry<Colors,Integer> pair : this.manaCost.entrySet()) {
-            str += String.format("%d-%s ", pair.getValue(), COLORS[pair.getKey().ordinal()]);
+            str += String.format("%d-%s ", pair.getValue(), pair.getKey().stringify());
         }
 
         return str;
     }
 
-    public Layout getLayout() {
+    public Layouts getLayout() {
         return layout;
     }
 
@@ -454,7 +445,7 @@ public class MagicCard implements IMagicCard {
         return toughness;
     }
 
-    public Iterator<EnumMap.Entry<Format, Boolean>> getLegalities() {
+    public Iterator<EnumMap.Entry<Formats, Boolean>> getLegalities() {
         return legalities.entrySet().iterator();
     }
 
@@ -468,7 +459,7 @@ public class MagicCard implements IMagicCard {
                 "\"%s\" [%s] Layout: %s, CMC: %.1f%s%s ",
                 this.name,
                 this.colorIdentity,
-                LAYOUT[this.layout.ordinal()],
+                this.layout.stringify(),
                 this.cmc,
                 ((this.manaCost.isEmpty()) ? "" : String.format(", ManaCost: %s", stringifyManaCost())),
                 ((this.power == null) ? "" : String.format(", [%s/%s]", this.power, this.toughness ))

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class CardHasColorFilter implements ICardFilter {
 
-    private Colors color;
+    private final Colors color;
 
     public CardHasColorFilter(Colors color) {
         this.color = color;
@@ -20,7 +20,7 @@ public class CardHasColorFilter implements ICardFilter {
     @Override
     public List<IMagicCard> query(List<IMagicCard> cards) {
 
-        List<IMagicCard> filteredList = new ArrayList<IMagicCard>();
+        List<IMagicCard> filteredList = new ArrayList<>();
 
         for(IMagicCard card : cards) {
             Iterator<Entry<Colors,Integer>> iter = card.getManaCostIterator();

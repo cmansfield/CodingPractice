@@ -26,11 +26,11 @@ public class CardGreatestPowerOrToughnessFilter implements ICardFilter {
     @Override
     public List<IMagicCard> query(List<IMagicCard> cards) {
 
-        List<IMagicCard> filteredList = new ArrayList<IMagicCard>();
+        List<IMagicCard> filteredList = new ArrayList<>();
         double max = -1;
         Pattern digitP = Pattern.compile(POWER_TOUGH_PATTERN);
         Matcher match;
-        String strValue = null;
+        String strValue;
 
 
         for(IMagicCard card : cards) {
