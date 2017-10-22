@@ -1,7 +1,0 @@
-
-Fix CardBuilder Card mana cost import, not importing mana combos like "manaCost": "{1}{R/W}"
-Fix CardBuilder Card power and toughness import
-Fix CardBuilder Card color identity to include all color identities
-Create additional card filters
-Export JSON lists of cards
-Import a CSV list of card names
